@@ -8,7 +8,8 @@ CREATE TABLE Students (
 	Id INT PRIMARY KEY IDENTITY,
 	FirstName NVARCHAR(20) NOT NULL,
 	LastName NVARCHAR(20) NOT NULL,
-	GroupId INT FOREIGN KEY REFERENCES Groups(Id)
+	Point FLOAT NOT NULL,
+	GroupId INT FOREIGN KEY REFERENCES Groups(Id) NOT NULL
 )
 CREATE TABLE Exams (
 	Id INT PRIMARY KEY IDENTITY,
@@ -22,10 +23,10 @@ CREATE TABLE StudentExams (
 	ResultPoint INT NOT NULL CHECK(ResultPoint <= 100 and ResultPoint >= 0)
 )
 INSERT INTO Groups VALUES ('P234'), ('P452'), ('P331')
-INSERT INTO Students VALUES ('Nasrin', 'Asadli', 1),
-	('Nilgun', 'Babazada', 1), ('Samira', 'Hajizada', 3),
-	('Jabbar', 'Jabbarli', 2), ('Melisa', 'Mansimli', 3),
-	('Maryam', 'Sahibova', 3), ('Bayram', 'Bayramov', 2)
+INSERT INTO Students VALUES ('Nasrin', 'Asadli', 90.2, 1),
+	('Nilgun', 'Babazada', 87.3, 1), ('Samira', 'Hajizada', 54.9, 3),
+	('Jabbar', 'Jabbarli', 40.1, 2), ('Melisa', 'Mansimli', 66.5, 3),
+	('Maryam', 'Sahibova', 73.8, 3), ('Bayram', 'Bayramov', 12.4, 2)
 INSERT INTO Exams VALUES
 	('C# Intro', '04/27/2023 16:30:00', '04/27/2023 17:00:00'),
 	('HTML/CSS', '06/01/2023 15:30:00', '06/01/2023 16:30:00'),
@@ -35,15 +36,15 @@ INSERT INTO StudentExams VALUES
 	(3, 2, 67), (3, 3, 56), (4, 1, 48), (5, 2, 70), (6, 1, 60), (6, 2, 71)
 
 --1 Bütün Student dataları və hər bir Student datasının yanında oxuduğu qrupun No dəyəri
-SELECT S.Id, S.FirstName, S.LastName, G.No AS 'Group No'
+SELECT S.Id, S.FirstName, S.LastName, S.Point, S.GroupId, Groups.[No] AS 'GroupNo'
 FROM Students S LEFT JOIN
-Groups G ON S.GroupId = G.Id
+Groups ON S.GroupId = Groups.Id
 
 --2 Bütün Student dataları və hər bir Student datasının yanında onun bütün imtahanlarının sayı
-SELECT S.Id, S.FirstName, S.LastName, COUNT(SE.ExamId) 'Exams Count'
+SELECT S.Id, S.FirstName, S.LastName, S.Point, COUNT(SE.ExamId) 'Exams Count'
 FROM Students S LEFT JOIN
 StudentExams SE ON S.Id = SE.StudentId
-GROUP BY S.Id, S.FirstName, S.LastName
+GROUP BY S.Id, S.FirstName, S.LastName, S.Point
 
 --3 Dünən baş vermiş bütün Examlər və hər bir Exam datasının yanında studentlərinin sayı
 SELECT E.Id, E.SubjectName, E.StartDate, E.EndDate, COUNT(SE.StudentId) 'Students Count'
@@ -61,7 +62,7 @@ JOIN Students S ON SE.StudentId = S.Id
 JOIN Groups ON S.GroupId = Groups.Id
 
 --5 Bütün Student dataları və hər bir Student datasının yanında onun bütün imtahanlarının ortalama result dəyəri
-SELECT S.Id, S.FirstName, S.LastName, AVG(SE.ResultPoint) 'Average'
+SELECT S.Id, S.FirstName, S.LastName, S.Point, AVG(SE.ResultPoint) 'Exams Average'
 FROM Students S LEFT JOIN
 StudentExams SE ON S.Id = SE.StudentId
-GROUP BY S.Id, S.FirstName, S.LastName
+GROUP BY S.Id, S.FirstName, S.LastName, S.Point
